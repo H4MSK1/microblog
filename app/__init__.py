@@ -1,7 +1,7 @@
 """
 Factory for application
 """
-
+# pylint: disable=redefined-outer-name
 import os
 import logging
 from logging.handlers import RotatingFileHandler
@@ -40,7 +40,7 @@ def create_app(config_class=ProdConfig):
     bootstrap.init_app(app)
     
 
-    #pylint: disable=wrong-import-position, cyclic-import
+    #pylint: disable=wrong-import-position, import-outside-toplevel, cyclic-import
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
 
