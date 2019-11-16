@@ -66,7 +66,7 @@ ssh-add ~/.ssh/aws
 #### AWS
 
 You need credentials from AWS to allow Ansible to manage servers. 
-Use the `insert_aws_keys_in_config.sh` script to paste AWS credentials from clipboard into `aws_keys.yml`.
+Use the `bash insert_aws_keys_in_config.sh` script to paste AWS credentials from clipboard into `aws_keys.yml`.
 
 #### Ansible vault
 
