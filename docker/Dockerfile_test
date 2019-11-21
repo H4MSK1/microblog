@@ -1,0 +1,20 @@
+FROM debian:stretch-slim
+
+RUN apt-get update && apt-get upgrade && \
+    apt-get install -y python3-pip python3-dev build-essential
+RUN pip3 install virtualenv
+
+WORKDIR /app
+COPY . /app
+RUN python3 -m virtualenv /app/venv
+RUN /bin/bash -c "source /app/venv/bin/activate"
+
+ENV LC_ALL=C.UTF-8
+ENV export LANG=C.UTF-8
+
+RUN make install-test
+RUN flask db upgrade
+
+RUN chmod +x test.sh
+
+ENTRYPOINT ["./test.sh"]
