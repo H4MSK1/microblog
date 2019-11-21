@@ -135,6 +135,13 @@ exec-tests: test-unit test-integration
 
 # target: test                         - Run tests and display code coverage
 .PHONY: test
+test:
+	docker-compose up --force-recreate --build test
+
+
+
+# target: tests                         - Run tests and display code coverage
+.PHONY: tests
 test: validate exec-tests
 	${py} -m coverage report  --rcfile=.coveragerc
 	$(MAKE) clean-cov
