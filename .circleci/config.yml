@@ -1,31 +1,24 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
-version: 2
-jobs:
-  build:
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      FLASK_ENV: production
+      FLASK_APP: microblog.py
+      IMAGE_NAME: microblog_prod
+      CI_IMAGE_NAME: project_prod
+      IMG_SHORT: prod
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.1
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
+      - image: circleci/buildpack-deps:stretch
+jobs:
+  test:
+    docker:
+      - image: circleci/python:3.7-node-browsers-legacy
     working_directory: ~/repo
-
+    environment:
+      FLASK_ENV: test
+      FLASK_APP: microblog.py
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
       - run:
           name: install dependencies
           command: |
@@ -33,13 +26,12 @@ jobs:
             . venv/bin/activate
             make install-test
       - run:
-          name: install dependencies
+          name: run integration tests
           command: |
-            python3 -m venv venv
             . venv/bin/activate
-            pip install -r requirements.txt
+            make test-integration
       - run:
-          name: run unit tests
+          name: run unittests
           command: |
             . venv/bin/activate
             make test-unit
@@ -48,11 +40,55 @@ jobs:
           command: |
             . venv/bin/activate
             make validate
+  build:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
       - run:
-          name: run integration tests
+          name: Build Docker image
+          command: docker-compose up --build -d $IMG_SHORT
+      - run:
+          name: Rename Docker image
+          command: docker tag $CI_IMAGE_NAME:latest moau17/microblog_prod:latest
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar moau17/microblog_prod
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker Image to Docker Hub
           command: |
-            . venv/bin/activate
-            make test-integration
-
-      - store_artifacts:
-          path: tests/coverage_html
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push moau17/microblog_prod:latest
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+      - publish-latest:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
