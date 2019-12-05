@@ -13,14 +13,15 @@ jobs:
   test:
     machine: true
     working_directory: ~/repo
-
+    executor: docker-publisher
     environment:
       FLASK_ENV: test
       FLASK_APP: microblog.py
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Run docker tests
+          name: Run tests with docker
           command: |
             sudo apt-get install python3-venv
             python3 -m venv venv
