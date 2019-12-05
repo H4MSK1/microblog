@@ -4,10 +4,12 @@ RUN adduser -D microblog
 WORKDIR /home/microblog
 
 COPY . .
-RUN python3 -m venv venv
-RUN apk add binutils libc-dev
+RUN apk --no-cache add libc-dev
+RUN python -m venv /home/microblog/venv
+RUN ls -la
+RUN source venv/bin/activate
 RUN venv/bin/pip3 install -r requirements.txt
-
+RUN venv/bin/pip3 install flask-babel
 
 RUN chmod +x boot.sh
 
