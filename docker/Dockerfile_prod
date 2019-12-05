@@ -5,6 +5,7 @@ WORKDIR /home/microblog
 
 COPY . .
 RUN python3 -m venv venv
+RUN apk add binutils libc-dev
 RUN venv/bin/pip3 install -r requirements.txt
 
 
