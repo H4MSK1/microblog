@@ -11,19 +11,16 @@ executors:
       - image: circleci/buildpack-deps:stretch
 jobs:
   test:
-    executor: docker-publisher
+    machine: true
+    working_directory: ~/repo
     environment:
       FLASK_ENV: test
       FLASK_APP: microblog.py
     steps:
       - checkout
-      - setup_remote_docker
       - run:
-          name: Run tests with docker
+          name: run docker tests
           command: |
-            sudo apt-get install python3-venv
-            python3 -m venv venv
-            . venv/bin/activate
             make test
   build:
     executor: docker-publisher
