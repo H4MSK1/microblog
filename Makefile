@@ -141,7 +141,7 @@ test:
 
 
 # target: tests                         - Run tests and display code coverage
-.PHONY: tests
+.PHONY: old-tests
 test: validate exec-tests
 	${py} -m coverage report  --rcfile=.coveragerc
 	$(MAKE) clean-cov
