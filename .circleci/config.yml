@@ -20,7 +20,8 @@ jobs:
       - checkout
       - run:
           name: "run docker tests"
-          command: "make test\n"
+          command: |
+          make test
   build:
     executor: docker-publisher
     steps:
