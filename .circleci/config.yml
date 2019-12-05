@@ -11,35 +11,18 @@ executors:
       - image: circleci/buildpack-deps:stretch
 jobs:
   test:
-    docker:
-      - image: circleci/python:3.7-node-browsers-legacy
+    machine: true
     working_directory: ~/repo
+
     environment:
       FLASK_ENV: test
       FLASK_APP: microblog.py
     steps:
       - checkout
       - run:
-          name: install dependencies
+          name: run docker tests
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make install-test
-      - run:
-          name: run integration tests
-          command: |
-            . venv/bin/activate
-            make test-integration
-      - run:
-          name: run unittests
-          command: |
-            . venv/bin/activate
-            make test-unit
-      - run:
-          name: run validate
-          command: |
-            . venv/bin/activate
-            make validate
+            make test
   build:
     executor: docker-publisher
     steps:
@@ -58,8 +41,8 @@ jobs:
           root: .
           paths:
             - ./image.tar
-  publish-latest:
-    executor: docker-publisher
+   publish-latest:
+     executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -72,6 +55,28 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push moau17/microblog_prod:latest
+  deploy-app-server:
+    executor: docker-publisher
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Install venv
+          command: sudo apt-get install python3-venv
+      - run:
+          name: Create venv
+          command: python3 -m venv venv
+      - run: echo "source ~/project/venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Install requirements to deploy app
+          command: pip3 install -r requirements/deploy.txt
+      - run:
+          name: Prepare password file
+          command: echo "$ANSIBLE_VAULT_PASSWORD" > ~/project/ansible/.vault_password.txt
+      - run:
+          name: Decrypt files and push to app_server
+          command: cd ansible && ansible-playbook gather_aws_instances.yml app_server.yml --vault-password-file .vault_password.txt
+
 workflows:
   version: 2
   build-master:
@@ -89,6 +94,12 @@ workflows:
       - publish-latest:
           requires:
             - build
+          filters:
+            branches:
+              only: master
+      - deploy-app-server:
+          requires:
+            - publish-latest
           filters:
             branches:
               only: master
