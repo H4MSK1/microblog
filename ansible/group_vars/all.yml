@@ -1,6 +1,5 @@
 ---
 # Here you can add variables that will be available for all hosts.
-
 region: us-east-1
 project_name: devops
-domain_name: <insert domain name>
+domain_name: dev-ops.wtf

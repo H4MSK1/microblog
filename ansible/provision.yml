@@ -1,7 +1,9 @@
 # Provision servers on AWS
 ---
-    -   hosts: local
-        connection: local # Keep ansible from open ssh connection
-        gather_facts: False
-        roles:
-            -   provision
+- hosts: local
+  connection: local # Keep ansible from open ssh connection
+  gather_facts: False
+  roles:
+    - provision
+  vars_files:
+    - aws_keys.yml

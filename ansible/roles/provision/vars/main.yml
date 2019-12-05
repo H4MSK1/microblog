@@ -1,31 +1,31 @@
 ---
-    keypair: aws
-    image: ami-0f5c5066b40f2414e
-    instances:
-      - instance_type: t2.micro
-        instance_tags:
-          project: "{{  project_name  }}"
-          name: appServer
-          Name: appServer
-        instance_ids:
-          - "app-server"
-        security_group: app-server
-        count: 1
-      - instance_type: t2.micro
-        instance_tags:
-          project: "{{  project_name  }}"
-          name: loadBalancer
-          Name: loadBalancer
-        instance_ids:
-          - "load-balancer"
-        security_group: load-balancer
-        count: 1
-      - instance_type: t2.micro
-        instance_tags:
-          project: "{{  project_name  }}"
-          name: "database"
-          Name: "database"
-        instance_ids:
-          - "database"
-        security_group: database
-        count: 1
+keypair: awspub
+image: ami-0f5c5066b40f2414e
+instances:
+  - instance_type: t2.micro
+    instance_tags:
+      project: "{{  project_name  }}"
+      name: appServer
+      Name: App-Server
+    instance_ids:
+      - "app-server"
+    security_group: app-server
+    count: 1
+  - instance_type: t2.micro
+    instance_tags:
+      project: "{{  project_name  }}"
+      name: loadBalancer
+      Name: Load-Balancer
+    instance_ids:
+      - "load-balancer"
+    security_group: load-balancer
+    count: 1
+  - instance_type: t2.micro
+    instance_tags:
+      project: "{{  project_name  }}"
+      name: "database"
+      Name: "Database"
+    instance_ids:
+      - "database"
+    security_group: database
+    count: 1
