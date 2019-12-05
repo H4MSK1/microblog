@@ -140,7 +140,7 @@ test:
 
 
 
-# target: tests                         - Run tests and display code coverage
+# target: old-tests                         - Run tests and display code coverage
 .PHONY: old-tests
 test: validate exec-tests
 	${py} -m coverage report  --rcfile=.coveragerc
