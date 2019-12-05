@@ -1,0 +1,12 @@
+---
+- name: Copy docker-compose file to host
+  copy:
+    src: files/docker-compose
+    dest: /home/{{ server_user }}/docker-compose.yml
+    owner: "{{ server_user }}"
+    group: "{{ server_user }}"
+    mode: "0644"
+
+- name: Run docker-compose up to start MySql
+  docker_compose:
+    project_src: /home/{{ server_user }}/

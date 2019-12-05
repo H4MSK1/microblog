@@ -1,0 +1,6 @@
+---
+docker_container_name: microblog
+docker_image: moau17/microblog_prod:latest
+
+host_port: 5000
+container_port: 5000

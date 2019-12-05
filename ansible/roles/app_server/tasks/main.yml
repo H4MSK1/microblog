@@ -1,0 +1,10 @@
+---
+- name: "Launch docker container with microblog application"
+  docker_container:
+    name: "{{ docker_container_name }}"
+    image: "{{ docker_image }}"
+    ports:
+      - "{{ host_port }}:{{ container_port }}"
+    restart_policy: always
+    env:
+      DATABASE_URL: "mysql+pymysql://microblog:pass@{{ groups['database'][0] }}/microblog"
