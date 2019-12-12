@@ -1,6 +1,8 @@
 ---
-docker_container_name: microblog
-docker_image: moau17/microblog_prod:latest
-
 host_port: 5000
 container_port: 5000
+container_name: microblog
+docker_network: host
+policy: always
+image_name: moau17/microblog_prod:latest
+database_url: mysql+pymysql://microblog:pass@{{ groups['database'][0] }}/microblog

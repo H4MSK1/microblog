@@ -1,0 +1,20 @@
+[Unit]
+Description={{serviceName}}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ userId }}
+Group={{ groupId }}
+#Restart=always
+RestartSec=30
+StartLimitInterval=0
+Type=simple
+ExecStart={{ exec_command }}
+
+[Install]
+WantedBy=multi-user.target
+
+[server]
+domain = {{ domain_name }}
+root_url = %(protocol)s://%(domain)s/prometheus/

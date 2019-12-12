@@ -3,5 +3,8 @@
   remote_user: deploy
   become: yes
   become_method: sudo
+  vars:
+    ansible_python_interpreter: /usr/bin/python3 # Required to avoid interpreter error
   roles:
+    - docker_dependencies
     - load_balancer

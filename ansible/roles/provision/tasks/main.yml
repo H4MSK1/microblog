@@ -15,49 +15,48 @@
     state: present
   loop: "{{ instances }}"
   register: ec2
+# - name: Allocate ellastic ip to load balancer
+#   ec2_eip:
+#     aws_access_key: "{{ aws_access_key }}"
+#     aws_secret_key: "{{ aws_secret_key }}"
+#     security_token: "{{ aws_session_token }}"
+#     device_id: "{{item.instance_ids[0]}}"
+#     state: present
+#     release_on_disassociation: yes
+#     region: "{{ region }}"
+#   with_items: "{{ec2.results}}"
+#   when: item.item.instance_tags.name == "loadBalancer"
 
-- name: Allocate ellastic ip to load balancer
-  ec2_eip:
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    security_token: "{{ aws_session_token }}"
-    device_id: "{{item.instance_ids[0]}}"
-    state: present
-    release_on_disassociation: yes
-    region: "{{ region }}"
-  with_items: "{{ec2.results}}"
-  when: item.item.instance_tags.name == "loadBalancer"
+# - name: Gather eip facts
+#   ec2_eip_facts:
+#     aws_access_key: "{{ aws_access_key }}"
+#     aws_secret_key: "{{ aws_secret_key }}"
+#     security_token: "{{ aws_session_token }}"
+#     region: "{{ region }}"
+#     filters:
+#       instance-id: "{{item.instance_ids[0]}}"
+#   with_items: "{{ec2.results}}"
+#   when: item.item.instance_tags.name == "loadBalancer"
+#   register: eip
 
-- name: Gather eip facts
-  ec2_eip_facts:
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    security_token: "{{ aws_session_token }}"
-    region: "{{ region }}"
-    filters:
-      instance-id: "{{item.instance_ids[0]}}"
-  with_items: "{{ec2.results}}"
-  when: item.item.instance_tags.name == "loadBalancer"
-  register: eip
+# - name: Set LB EIP fact
+#   set_fact:
+#     lb_eip: "{{item.addresses[0].public_ip}}"
+#   with_items: "{{eip.results}}"
+#   when: item.addresses is defined
 
-- name: Set LB EIP fact
-  set_fact:
-    lb_eip: "{{item.addresses[0].public_ip}}"
-  with_items: "{{eip.results}}"
-  when: item.addresses is defined
-
-- name: Set domain to LB ip in AWS (route53)
-  route53:
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    security_token: "{{ aws_session_token }}"
-    state: present
-    zone: "{{ domain_name }}"
-    record: "{{ item }}"
-    value: "{{lb_eip }}"
-    type: A
-    overwrite: yes
-    wait: yes
-  with_items:
-    - "{{ domain_name }}"
-    - "www.{{ domain_name }}"
+# - name: Set domain to LB ip in AWS (route53)
+#   route53:
+#     aws_access_key: "{{ aws_access_key }}"
+#     aws_secret_key: "{{ aws_secret_key }}"
+#     security_token: "{{ aws_session_token }}"
+#     state: present
+#     zone: "{{ domain_name }}"
+#     record: "{{ item }}"
+#     value: "{{ lb_eip }}"
+#     type: A
+#     overwrite: yes
+#     wait: yes
+#   with_items:
+#     - "{{ domain_name }}"
+#     - "www.{{ domain_name }}"

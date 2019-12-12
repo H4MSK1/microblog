@@ -1,0 +1,20 @@
+---
+serviceName: "prometheus"
+userId: "prometheus"
+groupId: "prometheus"
+exec_command: "/usr/bin/sudo /usr/local/bin/prometheus --web.external-url=https://dev-ops.wtf/prometheus --web.route-prefix="/" --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.conf --storage.tsdb.path=/data/prometheus --storage.tsdb.retention.time=2d"
+version: "2.10.0"
+
+database_ip: "{{ groups['database'][0] }}"
+database_port: 9104
+listen_database: "{{ database_ip }}:{{ database_port }}"
+
+app_ip: "{{ groups['appServer'][0] }}"
+app_port: 9102
+listen_app: "{{ app_ip }}:{{ app_port }}"
+
+load_ip: "{{ groups['loadBalancer'][0] }}"
+load_port: 9113
+listen_load: "{{ load_ip }}:{{ load_port }}"
+
+monitoring_ip: "{{ groups['monitoring'][0] }}"

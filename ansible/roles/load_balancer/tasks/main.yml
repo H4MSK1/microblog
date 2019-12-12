@@ -10,8 +10,6 @@
     path: /etc/letsencrypt/live/{{ domain_name }}/cert.pem
   register: letsencrypt_cert
 
-- debug: msg="{{ letsencrypt_cert.stat.exists }}"
-
 - name: Stop all nginx services
   command: service nginx stop
   when: not letsencrypt_cert.stat.exists
@@ -49,6 +47,16 @@
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
+
+- name: Run prom container
+  command: docker run -d \
+    --restart always \
+    -p {{ monitor_host_port }}:{{ monitor_container_port }} \
+    nginx/nginx-prometheus-exporter:{{ nginx_prom_version }} \
+    -nginx.scrape-uri=https://{{ domain_name }}/{{ prom_proxy_path }} \
+    -nginx.retries=10 \
+    -nginx.ssl-verify=false \
+    -web.telemetry-path=/prometheus
 
 - name: Restart nginx service
   command: service nginx start
