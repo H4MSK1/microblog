@@ -4,5 +4,4 @@ lb_method: "ip_hash"
 
 monitor_host_port: 9113
 monitor_container_port: 9113
-prom_proxy_path: metrics
 nginx_prom_version: 0.4.2

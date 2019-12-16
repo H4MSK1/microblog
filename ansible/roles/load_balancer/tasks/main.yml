@@ -53,7 +53,7 @@
     --restart always \
     -p {{ monitor_host_port }}:{{ monitor_container_port }} \
     nginx/nginx-prometheus-exporter:{{ nginx_prom_version }} \
-    -nginx.scrape-uri=https://{{ domain_name }}/{{ prom_proxy_path }} \
+    -nginx.scrape-uri=https://{{ domain_name }}/metrics \
     -nginx.retries=10 \
     -nginx.ssl-verify=false \
     -web.telemetry-path=/prometheus

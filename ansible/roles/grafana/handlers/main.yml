@@ -1,4 +1,4 @@
-- name: "Restart the Grafana service."
+- name: "Restart the Grafana service"
   service:
     name: grafana-server
     state: restarted

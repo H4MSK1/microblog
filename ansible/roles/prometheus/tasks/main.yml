@@ -1,76 +1,113 @@
 ---
-- name: Creating prometheus user group
-  group: name="{{ groupId }}"
+############## Node_exporter ##############
+- name: Create node_exporter user group
+  group: name="node_exporter"
   become: true
 
-- name: Creating prometheus user
+- name: Create node_exporter user
   user:
-    name: "{{ userId }}"
-    group: "{{ groupId }}"
+    name: "node_exporter"
+    group: "node_exporter"
     system: yes
     shell: "/sbin/nologin"
-    comment: "{{ userId }} nologin User"
+    comment: "node_exporter nologin User"
     createhome: "no"
     state: present
 
-- name: Install prometheus
+- name: Install prometheus node exporter
   unarchive:
-    src: "https://github.com/prometheus/prometheus/releases/download/v{{ version }}/prometheus-{{ version }}.linux-amd64.tar.gz"
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ node_exporter_build }}.tar.gz"
     dest: /tmp/
     remote_src: yes
 
-- name: Copy prometheus file to bin
+- name: Copy prometheus node exporter file to bin
   copy:
-    src: "/tmp/prometheus-{{ version }}.linux-amd64/prometheus"
-    dest: "/usr/local/bin/prometheus"
-    owner: "{{ userId }}"
-    group: "{{ groupId }}"
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_build }}/node_exporter"
+    dest: "/usr/local/bin/node_exporter"
+    owner: "node_exporter"
+    group: "node_exporter"
     remote_src: yes
     mode: 0755
 
-- name: Delete prometheus tmp folder
+- name: Delete node exporter tmp folder
   file:
-    path: "/tmp/prometheus-{{ version }}.linux-amd64"
+    path: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_build }}"
     state: absent
 
-- name: Creates directory
+- name: Setup node_exporter system service
+  template:
+    src: "services/node_exporter_service.j2"
+    dest: /etc/systemd/system/node_exporter.service
+
+- name: Reload daemon
+  command: sudo systemctl daemon-reload
+
+- name: Start node_exporter
+  command: sudo systemctl start node_exporter
+
+- name: Curl to see node_exporter metrics
+  uri:
+    url: http://localhost:9100/metrics
+    method: GET
+    status_code: 200
+  ignore_errors: yes
+
+############## Prometheus ##############
+- name: Create prometheus user group
+  group: name="prometheus"
+  become: true
+
+- name: Create prometheus user
+  user:
+    name: "prometheus"
+    group: "prometheus"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "prometheus nologin User"
+    createhome: "no"
+    state: present
+
+- name: Creates data directory for prometheus
   file:
     path: "/data/prometheus/"
     state: directory
-    owner: "{{ userId }}"
-    group: "{{ groupId }}"
+    owner: "prometheus"
+    group: "prometheus"
     mode: 0755
 
-- name: Creates directory
+- name: Create directory for prometheus
   file:
-    path: "/etc/prometheus/"
+    path: /etc/prometheus
     state: directory
-    owner: "{{ userId }}"
-    group: "{{ groupId }}"
+    owner: "prometheus"
+    group: "prometheus"
     mode: 0755
 
-- name: config file
+- name: Download prometheus file
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.{{ prometheus_build }}.tar.gz
+    dest: /
+    remote_src: yes
+
+- name: Extract downloaded prometheus file
+  unarchive:
+    src: /prometheus-{{ prometheus_version }}.{{ prometheus_build }}.tar.gz
+    dest: /etc/prometheus
+    remote_src: yes
+
+- name: Change in the file of prometheus.yml
   template:
-    src: prometheus.conf.j2
-    dest: /etc/prometheus/prometheus.conf
+    src: "templates/prometheus_conf.j2"
+    dest: /etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus.yml
 
-- name: Copy systemd init file
-  template:
-    src: init.service.j2
-    dest: /etc/systemd/system/prometheus.service
-  notify: systemd_reload
+- name: Start prometheus
+  shell: "/usr/bin/sudo /etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus --config.file=/etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus.yml  --web.external-url=https://{{ domain_name }}/prometheus --web.enable-lifecycle  --storage.tsdb.path=/data/prometheus --storage.tsdb.retention.time=2d &"
+  args:
+    executable: "/bin/bash"
 
-- name: Start prometheus service
-  service:
-    name: prometheus
-    state: started
-    enabled: yes
-
-- meta: flush_handlers
-
-- name: Check if prometheus is accessible
+- name: Curl to see if prometheus is accessible
   uri:
-    url: http://{{ monitoring_ip }}:9090/graph
+    url: http://localhost:9090/graph
     method: GET
     status_code: 200
   ignore_errors: yes
