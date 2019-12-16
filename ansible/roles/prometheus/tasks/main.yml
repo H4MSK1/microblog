@@ -107,7 +107,7 @@
 
 - name: Curl to see if prometheus is accessible
   uri:
-    url: http://localhost:9090/graph
+    url: http://localhost:9090/prometheus/graph
     method: GET
     status_code: 200
   ignore_errors: yes
