@@ -31,6 +31,6 @@ scrape_configs:
     static_configs:
       - targets: ['{{ groups["loadBalancer"][0] }}:9113']
 
-  - job_name: 'app'
+  - job_name: 'helloworld_gunicorn'
     static_configs:
       - targets: ['{{ groups["appServer"][0] }}:9102']
