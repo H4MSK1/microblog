@@ -1,58 +1,58 @@
 ---
 sg_groups:
-  # - name: load-balancer
-  #   description: SG for the load balancer
-  #   port_rules:
-  #     - proto: tcp
-  #       from_port: 22
-  #       to_port: 22
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 80
-  #       to_port: 80
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 443
-  #       to_port: 443
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 9113
-  #       to_port: 9113
-  #       cidr_ip: 0.0.0.0/0
-  # - name: app-server
-  #   description: SG for the application server
-  #   port_rules:
-  #     - proto: tcp
-  #       from_port: 22
-  #       to_port: 22
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 5000
-  #       to_port: 5000
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 9125
-  #       to_port: 9125
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 9102
-  #       to_port: 9102
-  #       cidr_ip: 0.0.0.0/0
-  # - name: database
-  #   description: SG for the database node
-  #   port_rules:
-  #     - proto: tcp
-  #       from_port: 22
-  #       to_port: 22
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 3306
-  #       to_port: 3306
-  #       cidr_ip: 0.0.0.0/0
-  #     - proto: tcp
-  #       from_port: 9104
-  #       to_port: 9104
-  #       cidr_ip: 0.0.0.0/0
+  - name: load-balancer
+    description: SG for the load balancer
+    port_rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 9113
+        to_port: 9113
+        cidr_ip: 0.0.0.0/0
+  - name: app-server
+    description: SG for the application server
+    port_rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 5000
+        to_port: 5000
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 9125
+        to_port: 9125
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 9102
+        to_port: 9102
+        cidr_ip: 0.0.0.0/0
+  - name: database
+    description: SG for the database node
+    port_rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 3306
+        to_port: 3306
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 9104
+        to_port: 9104
+        cidr_ip: 0.0.0.0/0
   - name: monitoring
     description: SG for the monitoring node
     port_rules:
