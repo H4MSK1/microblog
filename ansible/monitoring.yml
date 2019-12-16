@@ -4,6 +4,6 @@
   become: yes
   become_method: sudo
   roles:
+    - docker_dependencies
     - prometheus
-    - prometheus_node_exporter
     - grafana
