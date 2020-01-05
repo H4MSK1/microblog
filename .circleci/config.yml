@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  snyk: snyk/snyk@0.0.8
 executors:
   docker-publisher:
     environment:
@@ -10,6 +12,21 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
+  snyk:
+    docker:
+      - image: circleci/python:3.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            make install
+      - run: echo "source ~/repo/venv/bin/activate" >> $BASH_ENV
+      - snyk/scan
+
   test:
     machine: true
     working_directory: ~/repo
@@ -22,38 +39,41 @@ jobs:
           name: run docker tests
           command: |
             make test
-  # build:
-  #   executor: docker-publisher
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Build Docker image
-  #         command: docker-compose up --build -d $IMG_SHORT
-  #     - run:
-  #         name: Rename Docker image
-  #         command: docker tag $CI_IMAGE_NAME:latest moau17/microblog_prod:latest
-  #     - run:
-  #         name: Archive Docker image
-  #         command: docker save -o image.tar moau17/microblog_prod
-  #     - persist_to_workspace:
-  #         root: .
-  #         paths:
-  #           - ./image.tar
-  # publish-latest:
-  #   executor: docker-publisher
-  #   steps:
-  #     - attach_workspace:
-  #         at: /tmp/workspace
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Load archived Docker image
-  #         command: docker load -i /tmp/workspace/image.tar
-  #     - run:
-  #         name: Publish Docker Image to Docker Hub
-  #         command: |
-  #           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-  #           docker push moau17/microblog_prod:latest
+  build:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: docker-compose up --build -d $IMG_SHORT
+      - run:
+          name: Rename Docker image
+          command: docker tag $CI_IMAGE_NAME:latest moau17/microblog_prod:latest
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar moau17/microblog_prod
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - snyk/scan:
+          token-variable: SNYK_TOKEN
+          docker-image-name: moau17/microblog_prod
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push moau17/microblog_prod:latest
   # deploy-app-server:
   #   executor: docker-publisher
   #   working_directory: ~/project
@@ -80,22 +100,27 @@ workflows:
   version: 2
   build-master:
     jobs:
+      - snyk:
+        filters:
+          branches:
+            only: master
       - test:
           filters:
             branches:
               only: master
-      # - build:
-      #     requires:
-      #       - test
-      #     filters:
-      #       branches:
-      #         only: master
-      # - publish-latest:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only: master
+      - build:
+          requires:
+            - test
+            - snyk
+          filters:
+            branches:
+              only: master
+      - publish-latest:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       # - deploy-app-server:
       #     requires:
       #       - publish-latest
