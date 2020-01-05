@@ -84,3 +84,11 @@
     force: yes
     remove: yes
   ignore_errors: yes
+
+- name: Move sshd config
+  template:
+    src: templates/sshd_config.j2
+    dest: /etc/ssh/sshd_config
+
+- name: Reload service
+  command: sudo service sshd restart
