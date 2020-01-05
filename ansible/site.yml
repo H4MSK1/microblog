@@ -1,9 +1,10 @@
 ---
-# - import_playbook: terminate_ec2.yml
-# - import_playbook: provision.yml
+- import_playbook: terminate_ec2.yml
+- import_playbook: provision.yml
 - import_playbook: gather_aws_instances.yml
+- import_playbook: security_groups.yml
 - import_playbook: 10_first_minutes.yml
-# - import_playbook: database.yml
+- import_playbook: database.yml
 - import_playbook: app_server.yml
-# - import_playbook: load_balancer.yml
-# - import_playbook: monitoring.yml
+- import_playbook: load_balancer.yml
+- import_playbook: monitoring.yml
