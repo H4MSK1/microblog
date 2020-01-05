@@ -1,0 +1,9 @@
+# Security groups for servers on AWS
+---
+- hosts: local
+  connection: local # Keep ansible from open ssh connection
+  gather_facts: False
+  roles:
+    - security_groups
+  vars_files:
+    - aws_keys.yml
