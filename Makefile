@@ -97,6 +97,20 @@ validate:
 
 
 
+# target: bandit						- Run bandit tests
+.PHONY: bandit
+bandit:
+	bandit -c .bandit.yml -r app
+
+
+
+# target: Zap							- Run zap tests
+.PHONY: Zap
+Zap:
+	docker run --net host owasp/zap2docker-weekly zap-baseline.py -t https://dev-ops.wtf
+
+
+
 # target: test-integration             - Run tests in tests/integration with coverage.py
 .PHONY: test-integration
 test-integration: clean
