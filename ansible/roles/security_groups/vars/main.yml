@@ -18,7 +18,7 @@ sg_groups:
       - proto: tcp
         from_port: 9113
         to_port: 9113
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
   - name: app-server
     description: SG for the application server
     port_rules:
@@ -29,15 +29,19 @@ sg_groups:
       - proto: tcp
         from_port: 5000
         to_port: 5000
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['loadBalancer'][0] }}/32"
       - proto: tcp
         from_port: 9125
         to_port: 9125
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
+      - proto: tcp
+        from_port: 9125
+        to_port: 9125
+        cidr_ip: "{{ groups['appServer'][0] }}/32"
       - proto: tcp
         from_port: 9102
         to_port: 9102
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
   - name: database
     description: SG for the database node
     port_rules:
@@ -48,11 +52,11 @@ sg_groups:
       - proto: tcp
         from_port: 3306
         to_port: 3306
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['appServer'][0] }}/32"
       - proto: tcp
         from_port: 9104
         to_port: 9104
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
   - name: monitoring
     description: SG for the monitoring node
     port_rules:
@@ -63,16 +67,20 @@ sg_groups:
       - proto: tcp
         from_port: 9100
         to_port: 9100
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
       - proto: tcp
         from_port: 9090
         to_port: 9090
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['loadBalancer'][0] }}/32"
+      - proto: tcp
+        from_port: 9090
+        to_port: 9090
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
       - proto: tcp
         from_port: 9093
         to_port: 9093
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['monitoring'][0] }}/32"
       - proto: tcp
         from_port: 3000
         to_port: 3000
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: "{{ groups['loadBalancer'][0] }}/32"

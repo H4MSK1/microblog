@@ -1,0 +1,3 @@
+tests:
+skips:
+  - B303 # Ignore MD5 hashing warnings

@@ -101,7 +101,7 @@
     dest: /etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus.yml
 
 - name: Start prometheus
-  shell: "/usr/bin/sudo /etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus --config.file=/etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus.yml  --web.external-url=https://{{ domain_name }}/prometheus --web.enable-lifecycle  --storage.tsdb.path=/data/prometheus --storage.tsdb.retention.time=2d &"
+  shell: "/usr/bin/sudo /etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus --config.file=/etc/prometheus/prometheus-{{ prometheus_version }}.{{ prometheus_build }}/prometheus.yml --web.enable-lifecycle  --storage.tsdb.path=/data/prometheus --storage.tsdb.retention.time=2d &"
   args:
     executable: "/bin/bash"
 
