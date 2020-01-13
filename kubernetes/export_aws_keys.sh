@@ -1,3 +1,4 @@
+  
 #!/bin/bash
 
 # Reads AWS cridentials from clipboard, formats them and inserts to file. Keeping the file encrypted after.
